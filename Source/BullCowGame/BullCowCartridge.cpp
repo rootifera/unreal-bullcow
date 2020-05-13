@@ -6,21 +6,13 @@ void UBullCowCartridge::BeginPlay() // When the game starts
 {
     Super::BeginPlay();
 
+    Isograms = GetValidWords(Words);
+
     SetupGame();
-    
+
     PrintLine(TEXT("Welcome to Bull Cows!"));
     PrintLine(TEXT("The HiddenWord is: %s."), *HiddenWord); // Debug Line
     PrintLine(TEXT("Number of Possible Words is %i"), Words.Num());
-
-    TArray<FString> ValidWords = GetValidWords(Words);
-
-
-    for (int32 Index = 0; Index < ValidWords.Num(); Index++)
-    {
-        PrintLine(TEXT("%s"), *ValidWords[Index]);
-    }
-    
-    
 }
 
 void UBullCowCartridge::OnInput(const FString &Input) // When the player hits enter
@@ -38,7 +30,7 @@ void UBullCowCartridge::OnInput(const FString &Input) // When the player hits en
 
 void UBullCowCartridge::SetupGame()
 {
-    HiddenWord = TEXT("cakes");
+    HiddenWord = Isograms[FMath::RandRange(0, Isograms.Num() -1)];
     Lives = HiddenWord.Len();
     bGameOver = false;
     PrintLine(TEXT("You have %i lives availabe"), Lives);
@@ -53,7 +45,7 @@ void UBullCowCartridge::EndGame()
     PrintLine("\nWanna play again?");
 }
 
-void UBullCowCartridge::ProcessGuess(FString Guess)
+void UBullCowCartridge::ProcessGuess(const FString &Guess)
 {
 
     // is the guess incorrect, if so give warning and decrement life.
@@ -94,9 +86,8 @@ void UBullCowCartridge::ProcessGuess(FString Guess)
     PrintLine(TEXT("Guess again, you have %i lives left"), Lives);
 }
 
-bool UBullCowCartridge::IsIsogram(FString Word) const
+bool UBullCowCartridge::IsIsogram(const FString &Word) const
 {
-
 
     for (int32 Index = 0; Index < Word.Len(); Index++)
     {
@@ -112,19 +103,21 @@ bool UBullCowCartridge::IsIsogram(FString Word) const
     return true;
 }
 
-TArray<FString> UBullCowCartridge::GetValidWords(TArray<FString> ArrayToValidate) const{
+TArray<FString> UBullCowCartridge::GetValidWords(const TArray<FString> &ArrayToValidate) const
+{
 
     TArray<FString> ValidWords;
 
     for (auto Item : ArrayToValidate)
     {
-        if (Item.Len() >= 4 && Item.Len() <=8)
+        if (Item.Len() >= 4 && Item.Len() <= 8)
         {
-            if(IsIsogram(Item)){
+            if (IsIsogram(Item))
+            {
                 ValidWords.Emplace(Item);
             }
         }
     }
-    
+
     return ValidWords;
 }
